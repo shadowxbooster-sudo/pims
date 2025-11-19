@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Inventory Management System</title>
+    <meta charset="UTF-8" />
+    <style>
+        body { 
+            font-family: Arial; 
+            background:#111; color:white; padding:20px;
+        }
+        input, button { padding:10px; margin:5px; }
+        .box { background:#222; padding:20px; margin-bottom:20px; border-radius:10px; }
+        table { width:100%; border-collapse:collapse; margin-top:15px; }
+        th,td { border:1px solid #444; padding:10px; }
+    </style>
+</head>
+<body>
+
+<h1>📦 Product Inventory Management</h1>
+
+<div class="box">
+    <h2>Add Product</h2>
+    <input id="name" placeholder="Name"/>
+    <input id="price" placeholder="Price"/>
+    <input id="qty" placeholder="Qty"/>
+    <button onclick="addProduct()">Add</button>
+</div>
+
+<div class="box">
+    <h2>Remove Product</h2>
+    <input id="removeId" placeholder="Product ID"/>
+    <button onclick="removeProduct()">Remove</button>
+</div>
+
+<div class="box">
+    <h2>Update Quantity</h2>
+    <input id="updateId" placeholder="Product ID"/>
+    <input id="newQty" placeholder="New Quantity"/>
+    <button onclick="updateQty()">Update</button>
+</div>
+
+<div class="box">
+    <h2>Sort Products</h2>
+    <button onclick="sortName()">Sort By Name</button>
+    <button onclick="sortPrice()">Sort By Price</button>
+</div>
+
+<div class="box">
+    <h2>All Products</h2>
+    <button onclick="loadProducts()">Refresh List</button>
+    <table id="tbl"></table>
+</div>
+
+<script>
+const API = "https://your-render-backend-url.onrender.com";
+
+function addProduct(){
+    fetch(API + "/add?name="+name.value+"&price="+price.value+"&qty="+qty.value)
+    .then(r=>r.text()).then(alert);
+}
+
+function removeProduct(){
+    fetch(API + "/remove?id="+removeId.value)
+    .then(r=>r.text()).then(alert);
+}
+
+function updateQty(){
+    fetch(API + "/updateQty?id="+updateId.value+"&qty="+newQty.value)
+    .then(r=>r.text()).then(alert);
+}
+
+function sortName(){
+    fetch(API + "/sortName").then(r=>r.text()).then(alert);
+}
+function sortPrice(){
+    fetch(API + "/sortPrice").then(r=>r.text()).then(alert);
+}
+
+function loadProducts(){
+    fetch(API + "/list").then(r=>r.json()).then(data=>{
+        let html="<tr><th>ID</th><th>Name</th><th>Qty</th><th>Price</th></tr>";
+        data.forEach(p=>{
+            html+=`<tr>
+                <td>${p.id}</td>
+                <td>${p.name}</td>
+                <td>${p.quantity}</td>
+                <td>${p.price}</td>
+            </tr>`;
+        });
+        tbl.innerHTML=html;
+    });
+}
+</script>
+
+</body>
+</html>
