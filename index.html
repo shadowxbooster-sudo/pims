@@ -1,96 +1,861 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Inventory Management System</title>
-    <meta charset="UTF-8" />
     <style>
-        body { 
-            font-family: Arial; 
-            background:#111; color:white; padding:20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        input, button { padding:10px; margin:5px; }
-        .box { background:#222; padding:20px; margin-bottom:20px; border-radius:10px; }
-        table { width:100%; border-collapse:collapse; margin-top:15px; }
-        th,td { border:1px solid #444; padding:10px; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 90%, rgba(138, 43, 226, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 25px;
+            box-shadow: 0 30px 90px rgba(138, 43, 226, 0.5), 0 0 50px rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            border: 2px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8a2be2 0%, #4b0082 50%, #6a0dad 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 215, 0, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            text-shadow: 
+                0 0 10px rgba(255, 215, 0, 0.5),
+                0 0 20px rgba(138, 43, 226, 0.3),
+                2px 2px 8px rgba(0,0,0,0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 
+                    0 0 10px rgba(255, 215, 0, 0.5),
+                    0 0 20px rgba(138, 43, 226, 0.3),
+                    2px 2px 8px rgba(0,0,0,0.5);
+            }
+            to {
+                text-shadow: 
+                    0 0 20px rgba(255, 215, 0, 0.8),
+                    0 0 30px rgba(138, 43, 226, 0.5),
+                    2px 2px 8px rgba(0,0,0,0.5);
+            }
+        }
+
+        .header p {
+            font-size: 1.4em;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #ffd700;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 50px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9ff 100%);
+        }
+
+        .section {
+            background: linear-gradient(145deg, #ffffff 0%, #f0f0ff 100%);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 
+                0 10px 30px rgba(138, 43, 226, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(138, 43, 226, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 15px 40px rgba(138, 43, 226, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .section h2 {
+            background: linear-gradient(135deg, #8a2be2, #4b0082);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 4px solid;
+            border-image: linear-gradient(90deg, #8a2be2, #ffd700) 1;
+            padding-bottom: 15px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #8a2be2 0%, #4b0082 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border-left: 6px solid #ffd700;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            animation: shine 1s ease;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(138, 43, 226, 0.5);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .stat-label {
+            color: #ffffff;
+            font-size: 1em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            max-height: 500px;
+            overflow-y: auto;
+            box-shadow: 
+                0 8px 25px rgba(138, 43, 226, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(138, 43, 226, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #8a2be2 0%, #4b0082 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 20px 15px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 3px solid #ffd700;
+        }
+
+        td {
+            padding: 18px 15px;
+            border-bottom: 1px solid #e8e8ff;
+            color: #333;
+            font-size: 1.05em;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(90deg, rgba(138, 43, 226, 0.05) 0%, rgba(138, 43, 226, 0.15) 100%);
+            transform: scale(1.02);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 6em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+            filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.3));
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #8a2be2, #4b0082);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px;
+            border: 3px solid rgba(138, 43, 226, 0.2);
+            border-radius: 12px;
+            font-size: 1.05em;
+            transition: all 0.3s ease;
+            background: linear-gradient(to right, #ffffff 0%, #fafaFF 100%);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #8a2be2;
+            box-shadow: 0 0 0 5px rgba(138, 43, 226, 0.15), 0 0 20px rgba(255, 215, 0, 0.2);
+            background: white;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 18px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8a2be2 0%, #4b0082 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(108, 117, 125, 0.6);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.6);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .message {
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            display: none;
+            animation: slideIn 0.4s ease;
+            border-left: 6px solid;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left-color: #28a745;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2);
+        }
+
+        .message.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-left-color: #dc3545;
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.2);
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+        }
+
+        .footer p {
+            margin: 8px 0;
+            font-size: 1.05em;
+        }
+
+        .footer strong {
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+
+            .btn-group, .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar Styling */
+        .table-container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f0f0ff;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #8a2be2, #4b0082);
+            border-radius: 5px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #4b0082, #8a2be2);
+        }
     </style>
 </head>
 <body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📦 Product Inventory Management</h1>
+            <p>BY K-RAMP MEMBERS</p>
+        </div>
 
-<h1>📦 Product Inventory Management</h1>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Section: Product Inventory -->
+            <div class="section">
+                <h2>📋 Product Inventory</h2>
+                
+                <!-- Statistics -->
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalProducts">0</div>
+                        <div class="stat-label">Products</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalValue">₹0</div>
+                        <div class="stat-label">Total Value</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalQty">0</div>
+                        <div class="stat-label">Total Items</div>
+                    </div>
+                </div>
 
-<div class="box">
-    <h2>Add Product</h2>
-    <input id="name" placeholder="Name"/>
-    <input id="price" placeholder="Price"/>
-    <input id="qty" placeholder="Qty"/>
-    <button onclick="addProduct()">Add</button>
-</div>
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="loadProducts()">🔄 Refresh</button>
+                    <button class="btn btn-success" onclick="sortByName()">🔤 Sort by Name</button>
+                    <button class="btn btn-success" onclick="sortByPrice()">💰 Sort by Price</button>
+                    <button class="btn btn-secondary" onclick="clearAll()">🗑️ Clear All</button>
+                </div>
 
-<div class="box">
-    <h2>Remove Product</h2>
-    <input id="removeId" placeholder="Product ID"/>
-    <button onclick="removeProduct()">Remove</button>
-</div>
+                <!-- Products Table -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product Name</th>
+                                <th>Quantity</th>
+                                <th>Price (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTable">
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">📦</div>
+                                        <p style="font-size: 1.3em; font-weight: 600;">No products in inventory</p>
+                                        <p style="font-size: 1em; margin-top: 10px;">Add your first product →</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-<div class="box">
-    <h2>Update Quantity</h2>
-    <input id="updateId" placeholder="Product ID"/>
-    <input id="newQty" placeholder="New Quantity"/>
-    <button onclick="updateQty()">Update</button>
-</div>
+            <!-- Right Section: Product Management -->
+            <div class="section">
+                <h2>⚙️ Product Management</h2>
+                
+                <div id="message" class="message"></div>
 
-<div class="box">
-    <h2>Sort Products</h2>
-    <button onclick="sortName()">Sort By Name</button>
-    <button onclick="sortPrice()">Sort By Price</button>
-</div>
+                <div class="form-group">
+                    <label>🆔 Product ID</label>
+                    <input type="number" id="productId" placeholder="Auto-generated or enter custom ID">
+                </div>
 
-<div class="box">
-    <h2>All Products</h2>
-    <button onclick="loadProducts()">Refresh List</button>
-    <table id="tbl"></table>
-</div>
+                <div class="form-group">
+                    <label>📝 Product Name</label>
+                    <input type="text" id="productName" placeholder="Enter product name">
+                </div>
 
-<script>
-const API = "https://your-render-backend-url.onrender.com";
+                <div class="form-group">
+                    <label>📦 Quantity</label>
+                    <input type="number" id="productQty" placeholder="Enter quantity" min="0">
+                </div>
 
-function addProduct(){
-    fetch(API + "/add?name="+name.value+"&price="+price.value+"&qty="+qty.value)
-    .then(r=>r.text()).then(alert);
-}
+                <div class="form-group">
+                    <label>💵 Price (₹)</label>
+                    <input type="number" id="productPrice" placeholder="Enter price" step="0.01" min="0">
+                </div>
 
-function removeProduct(){
-    fetch(API + "/remove?id="+removeId.value)
-    .then(r=>r.text()).then(alert);
-}
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="addProduct()">➕ Add Product</button>
+                    <button class="btn btn-danger" onclick="removeProduct()">🗑️ Remove by ID</button>
+                    <button class="btn btn-success" onclick="updateQuantity()">🔄 Update Quantity</button>
+                    <button class="btn btn-secondary" onclick="clearForm()">✖️ Clear Form</button>
+                </div>
+            </div>
+        </div>
 
-function updateQty(){
-    fetch(API + "/updateQty?id="+updateId.value+"&qty="+newQty.value)
-    .then(r=>r.text()).then(alert);
-}
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Product Inventory Management System</strong></p>
+            <p>Core Backend: <strong>SimpleInventoryApp.java</strong> (Java OOPS)</p>
+            <p>Frontend Interface: <strong>HTML</strong></p>
+            <p>OOPS Concepts: Classes, Objects, Constructors, Encapsulation, Access Modifiers, Methods, Method Overloading Style Input Helpers, Control Statements (if/else), Loops (while & for-each), Switch-Case Menu, Scanner Input, Arrays/Collections (ArrayList), Comparator (Anonymous Comparator using lambda), Exception Handling (basic try–catch), Wrapper Classes (Integer/Double via parsing), and Modular OOP Design.</p>
+        </div>
+    </div>
 
-function sortName(){
-    fetch(API + "/sortName").then(r=>r.text()).then(alert);
-}
-function sortPrice(){
-    fetch(API + "/sortPrice").then(r=>r.text()).then(alert);
-}
+    <script>
+        // Product class (matches Java implementation)
+        class Product {
+            constructor(id, name, price, quantity) {
+                this.id = parseInt(id);
+                this.name = name;
+                this.price = parseFloat(price);
+                this.quantity = parseInt(quantity);
+            }
 
-function loadProducts(){
-    fetch(API + "/list").then(r=>r.json()).then(data=>{
-        let html="<tr><th>ID</th><th>Name</th><th>Qty</th><th>Price</th></tr>";
-        data.forEach(p=>{
-            html+=`<tr>
-                <td>${p.id}</td>
-                <td>${p.name}</td>
-                <td>${p.quantity}</td>
-                <td>${p.price}</td>
-            </tr>`;
-        });
-        tbl.innerHTML=html;
-    });
-}
-</script>
+            getId() { return this.id; }
+            getName() { return this.name; }
+            getPrice() { return this.price; }
+            getQuantity() { return this.quantity; }
+            setQuantity(q) { this.quantity = parseInt(q); }
+        }
 
+        // ArrayList equivalent
+        let products = [];
+        let nextId = 1;
+
+        // Load from localStorage
+        window.onload = function() {
+            const saved = localStorage.getItem('inventoryProducts');
+            if (saved) {
+                const data = JSON.parse(saved);
+                products = data.products.map(p => new Product(p.id, p.name, p.price, p.quantity));
+                nextId = data.nextId || 1;
+            }
+            loadProducts();
+        };
+
+        // Save to localStorage
+        function saveData() {
+            localStorage.setItem('inventoryProducts', JSON.stringify({
+                products: products,
+                nextId: nextId
+            }));
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => msg.classList.remove('show'), 3500);
+        }
+
+        // Load products
+        function loadProducts() {
+            const tbody = document.getElementById('productsTable');
+            
+            if (products.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4">
+                            <div class="empty-state">
+                                <div class="empty-icon">📦</div>
+                                <p style="font-size: 1.3em; font-weight: 600;">No products in inventory</p>
+                                <p style="font-size: 1em; margin-top: 10px;">Add your first product →</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = products.map(p => `
+                    <tr>
+                        <td><strong>${p.getId()}</strong></td>
+                        <td>${p.getName()}</td>
+                        <td>${p.getQuantity()}</td>
+                        <td><strong>₹${p.getPrice().toFixed(2)}</strong></td>
+                    </tr>
+                `).join('');
+            }
+
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = products.length;
+            const totalValue = products.reduce((sum, p) => sum + (p.getPrice() * p.getQuantity()), 0);
+            const totalQty = products.reduce((sum, p) => sum + p.getQuantity(), 0);
+
+            document.getElementById('totalProducts').textContent = total;
+            document.getElementById('totalValue').textContent = '₹' + totalValue.toFixed(2);
+            document.getElementById('totalQty').textContent = totalQty;
+        }
+
+        // Add product
+        function addProduct() {
+            const idInput = document.getElementById('productId').value;
+            const id = idInput ? parseInt(idInput) : nextId;
+            const name = document.getElementById('productName').value.trim();
+            const qty = document.getElementById('productQty').value;
+            const price = document.getElementById('productPrice').value;
+
+            if (!name) {
+                showMessage('❌ Please enter product name!', 'error');
+                return;
+            }
+
+            if (!qty || qty < 0) {
+                showMessage('❌ Please enter valid quantity!', 'error');
+                return;
+            }
+
+            if (!price || price < 0) {
+                showMessage('❌ Please enter valid price!', 'error');
+                return;
+            }
+
+            if (products.find(p => p.getId() === id)) {
+                showMessage('❌ Product ID already exists!', 'error');
+                return;
+            }
+
+            products.push(new Product(id, name, price, qty));
+            if (!idInput) nextId++;
+            else nextId = Math.max(nextId, id + 1);
+
+            saveData();
+            loadProducts();
+            clearForm();
+            showMessage('✅ Product added successfully!', 'success');
+        }
+
+        // Remove product
+        function removeProduct() {
+            const id = parseInt(document.getElementById('productId').value);
+
+            if (!id) {
+                showMessage('❌ Please enter Product ID to remove!', 'error');
+                return;
+            }
+
+            const index = products.findIndex(p => p.getId() === id);
+
+            if (index !== -1) {
+                products.splice(index, 1);
+                saveData();
+                loadProducts();
+                clearForm();
+                showMessage('🗑️ Product removed successfully!', 'success');
+            } else {
+                showMessage('❌ Product not found!', 'error');
+            }
+        }
+
+        // Update quantity
+        function updateQuantity() {
+            const id = parseInt(document.getElementById('productId').value);
+            const newQty = document.getElementById('productQty').value;
+
+            if (!id) {
+                showMessage('❌ Please enter Product ID!', 'error');
+                return;
+            }
+
+            if (!newQty || newQty < 0) {
+                showMessage('❌ Please enter valid quantity!', 'error');
+                return;
+            }
+
+            const product = products.find(p => p.getId() === id);
+
+            if (product) {
+                product.setQuantity(newQty);
+                saveData();
+                loadProducts();
+                showMessage('✅ Quantity updated successfully!', 'success');
+            } else {
+                showMessage('❌ Product not found!', 'error');
+            }
+        }
+
+        // Sort by name (using Comparator concept)
+        function sortByName() {
+            products.sort((a, b) => a.getName().toLowerCase().localeCompare(b.getName().toLowerCase()));
+            saveData();
+            loadProducts();
+            showMessage('✅ Products sorted by name!', 'success');
+        }
+
+        // Sort by price (using Comparator concept)
+        function sortByPrice() {
+            products.sort((a, b) => a.getPrice() - b.getPrice());
+            saveData();
+            loadProducts();
+            showMessage('✅ Products sorted by price!', 'success');
+        }
+
+        // Clear all
+        function clearAll() {
+            if (products.length === 0) {
+                showMessage('ℹ️ No products to clear!', 'error');
+                return;
+            }
+
+            if (confirm('⚠️ Are you sure you want to delete all products?')) {
+                products = [];
+                nextId = 1;
+                saveData();
+                loadProducts();
+                showMessage('🗑️ All products cleared!', 'success');
+            }
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('productId').value = '';
+            document.getElementById('productName').value = '';
+            document.getElementById('productQty').value = '';
+            document.getElementById('productPrice').value = '';
+        }
+    </script>
 </body>
 </html>
